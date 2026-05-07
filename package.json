@@ -2,14 +2,19 @@
   "name": "ma-cave",
   "private": true,
   "workspaces": [
-    "backend"
+    "backend",
+    "frontend"
   ],
   "scripts": {
     "dev": "npm run dev -w backend",
-    "build": "npm run build -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "build:backend": "npm run build -w backend",
+    "build:frontend": "npm run build -w frontend",
     "start": "npm run start -w backend",
+    "test": "npm run test -w frontend",
     "import:viniou": "npm run import:viniou -w backend",
     "import:viniou:dev": "npm run import:viniou:dev -w backend",
-    "typecheck": "npm run typecheck -w backend"
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend"
   }
 }
