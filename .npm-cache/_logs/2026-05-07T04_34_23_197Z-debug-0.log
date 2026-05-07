@@ -1,0 +1,74 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.2.0
+2 info using node@v24.13.0
+3 silly config load:file:C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:C:\tmp\MaCave\.npmrc
+5 silly config load:file:C:\Users\AntoineBILLOTTE\.npmrc
+6 silly config load:file:C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install
+8 verbose argv "install" "--cache" ".\\.npm-cache"
+9 verbose logfile logs-max:10 dir:C:\tmp\MaCave\.npm-cache\_logs\2026-05-07T04_34_23_197Z-
+10 verbose logfile C:\tmp\MaCave\.npm-cache\_logs\2026-05-07T04_34_23_197Z-debug-0.log
+11 silly logfile done cleaning log files
+12 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ECONNREFUSED
+13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+14 silly idealTree buildDeps
+15 silly placeDep ROOT backend@ OK for:  want: file:C:\tmp\MaCave\backend
+16 silly fetch manifest @fast-csv/parse@^5.0.2
+17 silly packumentCache full:https://registry.npmjs.org/@fast-csv%2fparse cache-miss
+18 silly fetch manifest better-sqlite3@^11.8.1
+19 silly packumentCache full:https://registry.npmjs.org/better-sqlite3 cache-miss
+20 silly fetch manifest cors@^2.8.5
+21 silly packumentCache full:https://registry.npmjs.org/cors cache-miss
+22 silly fetch manifest drizzle-orm@^0.38.4
+23 silly packumentCache full:https://registry.npmjs.org/drizzle-orm cache-miss
+24 silly fetch manifest express@^4.21.2
+25 silly packumentCache full:https://registry.npmjs.org/express cache-miss
+26 silly fetch manifest zod@^3.24.1
+27 silly packumentCache full:https://registry.npmjs.org/zod cache-miss
+28 silly fetch manifest @types/better-sqlite3@^7.6.12
+29 silly packumentCache full:https://registry.npmjs.org/@types%2fbetter-sqlite3 cache-miss
+30 silly fetch manifest @types/cors@^2.8.17
+31 silly packumentCache full:https://registry.npmjs.org/@types%2fcors cache-miss
+32 silly fetch manifest @types/express@^5.0.0
+33 silly packumentCache full:https://registry.npmjs.org/@types%2fexpress cache-miss
+34 silly fetch manifest @types/node@^22.10.2
+35 silly packumentCache full:https://registry.npmjs.org/@types%2fnode cache-miss
+36 silly fetch manifest tsx@^4.19.2
+37 silly packumentCache full:https://registry.npmjs.org/tsx cache-miss
+38 silly fetch manifest typescript@^5.7.2
+39 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+40 silly placeDep backend @fast-csv/parse@ OK for: backend want: ^5.0.2
+41 silly placeDep backend @types/better-sqlite3@ OK for: backend want: ^7.6.12
+42 silly placeDep backend @types/cors@ OK for: backend want: ^2.8.17
+43 silly placeDep backend @types/express@ OK for: backend want: ^5.0.0
+44 silly placeDep backend @types/node@ OK for: backend want: ^22.10.2
+45 silly placeDep backend better-sqlite3@ OK for: backend want: ^11.8.1
+46 silly placeDep backend cors@ OK for: backend want: ^2.8.5
+47 silly placeDep backend drizzle-orm@ OK for: backend want: ^0.38.4
+48 silly placeDep backend express@ OK for: backend want: ^4.21.2
+49 silly placeDep backend tsx@ OK for: backend want: ^4.19.2
+50 silly placeDep backend typescript@ OK for: backend want: ^5.7.2
+51 silly placeDep backend zod@ OK for: backend want: ^3.24.1
+52 verbose stack Error: request to https://registry.npmjs.org/@fast-csv%2fparse failed: cache mode is 'only-if-cached' but no cached response is available.
+52 verbose stack     at cacheFetch (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\make-fetch-happen\lib\cache\index.js:12:13)
+52 verbose stack     at async fetch (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\make-fetch-happen\lib\fetch.js:98:7)
+52 verbose stack     at async RegistryFetcher.packument (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\pacote\lib\registry.js:90:19)
+52 verbose stack     at async RegistryFetcher.manifest (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\pacote\lib\registry.js:128:23)
+52 verbose stack     at async #fetchManifest (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1202:20)
+52 verbose stack     at async #nodeFromEdge (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1040:19)
+52 verbose stack     at async #buildDepStep (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:904:11)
+52 verbose stack     at async Arborist.buildIdealTree (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:181:7)
+52 verbose stack     at async Promise.all (index 1)
+52 verbose stack     at async Arborist.reify (C:\Users\AntoineBILLOTTE\AppData\Roaming\npm\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:131:5)
+53 error code ENOTCACHED
+54 error request to https://registry.npmjs.org/@fast-csv%2fparse failed: cache mode is 'only-if-cached' but no cached response is available.
+55 silly unfinished npm timer reify 1778128463965
+56 silly unfinished npm timer reify:loadTrees 1778128463966
+57 verbose cwd C:\tmp\MaCave
+58 verbose os Windows_NT 10.0.26200
+59 verbose node v24.13.0
+60 verbose npm  v11.2.0
+61 verbose exit 1
+62 verbose code 1
+63 error A complete log of this run can be found in: C:\tmp\MaCave\.npm-cache\_logs\2026-05-07T04_34_23_197Z-debug-0.log

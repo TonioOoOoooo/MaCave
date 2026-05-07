@@ -1,0 +1,15 @@
+{
+  "name": "ma-cave",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w backend",
+    "build": "npm run build -w backend",
+    "start": "npm run start -w backend",
+    "import:viniou": "npm run import:viniou -w backend",
+    "import:viniou:dev": "npm run import:viniou:dev -w backend",
+    "typecheck": "npm run typecheck -w backend"
+  }
+}

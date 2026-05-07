@@ -1,0 +1,15 @@
+services:
+  ma-cave:
+    build: .
+    container_name: ma-cave
+    restart: unless-stopped
+    environment:
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      DATABASE_URL: file:/app/data/cave.db
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./imports:/app/imports
