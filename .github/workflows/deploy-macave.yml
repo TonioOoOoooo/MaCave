@@ -85,4 +85,4 @@ jobs:
             -o StrictHostKeyChecking=yes \
             -p "${{ secrets.SSH_PORT }}" \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "test -s '${{ secrets.SSH_DATA_DIR }}/macave.sqlite' && ls -lh '${{ secrets.SSH_DATA_DIR }}' && sudo systemctl restart macave.service && sudo systemctl status macave.service --no-pager --lines=20 && curl -fsS http://127.0.0.1:3015/api/health && curl -fsS http://127.0.0.1:3015/api/dashboard"
+            "test -s '${{ secrets.SSH_DATA_DIR }}/macave.sqlite' && ls -lh '${{ secrets.SSH_DATA_DIR }}' && sudo systemctl restart macave.service && sudo systemctl status macave.service --no-pager --lines=20 && for i in {1..10}; do curl -fsS http://127.0.0.1:3015/api/health && break; sleep 1; done && curl -fsS http://127.0.0.1:3015/api/dashboard"
