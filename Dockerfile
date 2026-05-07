@@ -19,5 +19,5 @@ COPY imports/.gitkeep ./imports/.gitkeep
 COPY data/.gitkeep ./data/.gitkeep
 COPY data/uploads/.gitkeep ./data/uploads/.gitkeep
 COPY data/backups/.gitkeep ./data/backups/.gitkeep
-EXPOSE 3000
+EXPOSE 3015
 CMD ["npm", "run", "start", "-w", "backend"]
