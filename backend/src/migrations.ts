@@ -63,6 +63,36 @@ export const initSql = `
     FOREIGN KEY (wine_id) REFERENCES wines(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS wine_enrichments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    wine_id INTEGER,
+    viniou_id TEXT NOT NULL,
+    service_temperature TEXT,
+    recommended_aeration TEXT,
+    peak_text TEXT,
+    stock_amount REAL,
+    market_stock_value REAL,
+    added_value REAL,
+    market_price_month TEXT,
+    consumption_status TEXT,
+    consumed_quantity INTEGER,
+    food_pairing_1_name TEXT,
+    food_pairing_1_description TEXT,
+    food_pairing_2_name TEXT,
+    food_pairing_2_description TEXT,
+    food_pairing_3_name TEXT,
+    food_pairing_3_description TEXT,
+    viniou_review TEXT,
+    viniou_review_date TEXT,
+    image_url TEXT,
+    attached_files TEXT,
+    critic_notes TEXT,
+    viniou_sheet_url TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (wine_id) REFERENCES wines(id) ON DELETE SET NULL
+  );
+
   CREATE UNIQUE INDEX IF NOT EXISTS wines_viniou_id_unique_idx ON wines(viniou_id) WHERE viniou_id IS NOT NULL;
   CREATE INDEX IF NOT EXISTS wines_country_idx ON wines(country);
   CREATE INDEX IF NOT EXISTS wines_region_idx ON wines(region);
@@ -70,4 +100,6 @@ export const initSql = `
   CREATE INDEX IF NOT EXISTS wines_vintage_idx ON wines(vintage);
   CREATE INDEX IF NOT EXISTS wines_peak_min_idx ON wines(peak_min);
   CREATE INDEX IF NOT EXISTS tasting_notes_wine_id_idx ON tasting_notes(wine_id);
+  CREATE UNIQUE INDEX IF NOT EXISTS wine_enrichments_viniou_id_unique_idx ON wine_enrichments(viniou_id);
+  CREATE INDEX IF NOT EXISTS wine_enrichments_wine_id_idx ON wine_enrichments(wine_id);
 `;

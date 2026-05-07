@@ -64,8 +64,38 @@ export const tastingNotes = sqliteTable("tasting_notes", {
   updatedAt: text("updated_at").notNull()
 });
 
+export const wineEnrichments = sqliteTable("wine_enrichments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  wineId: integer("wine_id").references(() => wines.id, { onDelete: "set null" }),
+  viniouId: text("viniou_id").notNull(),
+  serviceTemperature: text("service_temperature"),
+  recommendedAeration: text("recommended_aeration"),
+  peakText: text("peak_text"),
+  stockAmount: real("stock_amount"),
+  marketStockValue: real("market_stock_value"),
+  addedValue: real("added_value"),
+  marketPriceMonth: text("market_price_month"),
+  consumptionStatus: text("consumption_status"),
+  consumedQuantity: integer("consumed_quantity"),
+  foodPairing1Name: text("food_pairing_1_name"),
+  foodPairing1Description: text("food_pairing_1_description"),
+  foodPairing2Name: text("food_pairing_2_name"),
+  foodPairing2Description: text("food_pairing_2_description"),
+  foodPairing3Name: text("food_pairing_3_name"),
+  foodPairing3Description: text("food_pairing_3_description"),
+  viniouReview: text("viniou_review"),
+  viniouReviewDate: text("viniou_review_date"),
+  imageUrl: text("image_url"),
+  attachedFiles: text("attached_files"),
+  criticNotes: text("critic_notes"),
+  viniouSheetUrl: text("viniou_sheet_url"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull()
+});
+
 export const winesRelations = relations(wines, ({ many }) => ({
-  tastingNotes: many(tastingNotes)
+  tastingNotes: many(tastingNotes),
+  enrichments: many(wineEnrichments)
 }));
 
 export const tastingNotesRelations = relations(tastingNotes, ({ one }) => ({
@@ -75,7 +105,16 @@ export const tastingNotesRelations = relations(tastingNotes, ({ one }) => ({
   })
 }));
 
+export const wineEnrichmentsRelations = relations(wineEnrichments, ({ one }) => ({
+  wine: one(wines, {
+    fields: [wineEnrichments.wineId],
+    references: [wines.id]
+  })
+}));
+
 export type Wine = typeof wines.$inferSelect;
 export type NewWine = typeof wines.$inferInsert;
 export type TastingNote = typeof tastingNotes.$inferSelect;
 export type NewTastingNote = typeof tastingNotes.$inferInsert;
+export type WineEnrichment = typeof wineEnrichments.$inferSelect;
+export type NewWineEnrichment = typeof wineEnrichments.$inferInsert;

@@ -15,6 +15,8 @@
     "test": "npm run test -w frontend",
     "import:viniou": "npm run import:viniou -w backend",
     "import:viniou:dev": "npm run import:viniou:dev -w backend",
+    "import:enrichments": "npm run import:enrichments -w backend",
+    "import:enrichments:dev": "npm run import:enrichments:dev -w backend",
     "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend"
   }
 }

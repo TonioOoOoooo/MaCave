@@ -8,6 +8,8 @@
     "start": "node dist/index.js",
     "import:viniou": "node dist/scripts/import-viniou.js",
     "import:viniou:dev": "tsx src/scripts/import-viniou.ts",
+    "import:enrichments": "node dist/scripts/import-enrichments.js",
+    "import:enrichments:dev": "tsx src/scripts/import-enrichments.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

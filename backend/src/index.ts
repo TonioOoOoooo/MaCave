@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { migrate } from "./db.js";
 import { errorHandler } from "./http.js";
+import { dashboardRouter } from "./routes/dashboard.routes.js";
 import { winesRouter } from "./routes/wines.routes.js";
 
 migrate();
@@ -21,6 +22,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/wines", winesRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use(errorHandler);
 

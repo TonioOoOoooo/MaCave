@@ -74,7 +74,8 @@ describe("WinesList", () => {
     );
 
     const card = await screen.findByRole("button", { name: /Chateau Test - Reserve/i });
-    expect(screen.getByText("1 vins")).toBeInTheDocument();
+    expect(screen.getByText("1 vins au total")).toBeInTheDocument();
+    expect(screen.getByText("Page 1 / 1 - 1 affiche")).toBeInTheDocument();
 
     await userEvent.click(card);
 

@@ -9,9 +9,9 @@ describe("api client", () => {
   it("builds wine list query parameters", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(jsonResponse({ items: [], page: 1, pageSize: 10, total: 0, totalPages: 0, sortBy: "region", sortOrder: "asc" }));
 
-    await listWines({ page: 2, pageSize: 10, search: " Bordeaux " });
+    await listWines({ page: 2, pageSize: 10, search: " Bordeaux ", sortBy: "vintage", sortOrder: "desc" });
 
-    expect(fetchMock).toHaveBeenCalledWith("/api/wines?page=2&pageSize=10&search=Bordeaux", expect.any(Object));
+    expect(fetchMock).toHaveBeenCalledWith("/api/wines?page=2&pageSize=10&search=Bordeaux&sortBy=vintage&sortOrder=desc", expect.any(Object));
   });
 
   it("uses POST when consuming a bottle", async () => {

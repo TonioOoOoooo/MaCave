@@ -59,10 +59,97 @@ export type TastingNote = {
   updatedAt: string;
 };
 
+export type WineEnrichment = {
+  id: number;
+  wineId: number | null;
+  viniouId: string;
+  serviceTemperature: string | null;
+  recommendedAeration: string | null;
+  peakText: string | null;
+  stockAmount: number | null;
+  marketStockValue: number | null;
+  addedValue: number | null;
+  marketPriceMonth: string | null;
+  consumptionStatus: string | null;
+  consumedQuantity: number | null;
+  foodPairing1Name: string | null;
+  foodPairing1Description: string | null;
+  foodPairing2Name: string | null;
+  foodPairing2Description: string | null;
+  foodPairing3Name: string | null;
+  foodPairing3Description: string | null;
+  viniouReview: string | null;
+  viniouReviewDate: string | null;
+  imageUrl: string | null;
+  attachedFiles: string | null;
+  criticNotes: string | null;
+  viniouSheetUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type DashboardWine = {
+  id: number;
+  estate: string | null;
+  cuvee: string | null;
+  appellation: string | null;
+  region: string | null;
+  country: string | null;
+  vintage: number | null;
+  quantity: number;
+  color: string | null;
+  wineType: string | null;
+  agingPhases: string | null;
+  grapes: string | null;
+  cellar: string | null;
+  packagingType: string | null;
+  purchaseType: string | null;
+  lastPurchaseDate: string | null;
+  lastOutDate: string | null;
+  lastOutNote: string | null;
+  totalValue: number | null;
+  marketUnitPrice: number | null;
+  imageUrl: string | null;
+};
+
+export type DashboardCount = {
+  label: string;
+  count: number;
+};
+
+export type DashboardResponse = {
+  totals: {
+    bottles: number;
+    wines: number;
+    value: number;
+    stockValue: number;
+    addedValue: number;
+  };
+  phaseCounts: {
+    youth: number;
+    maturity: number;
+    peak: number;
+    decline: number;
+  };
+  latestEntries: DashboardWine[];
+  latestOutputs: DashboardWine[];
+  drinkReadyWines: DashboardWine[];
+  colorCounts: DashboardCount[];
+  regionCounts: DashboardCount[];
+  grapeCounts: DashboardCount[];
+  vintageRanges: DashboardCount[];
+  cellarCounts: DashboardCount[];
+  packagingCounts: DashboardCount[];
+  purchaseTypeCounts: DashboardCount[];
+  recentWines: DashboardWine[];
+};
+
 export type WinesQuery = {
   page: number;
   pageSize: number;
   search?: string;
+  sortBy?: "region" | "vintage" | "quantity";
+  sortOrder?: "asc" | "desc";
 };
 
 export type WinesResponse = {
@@ -87,7 +174,19 @@ export async function listWines(query: WinesQuery): Promise<WinesResponse> {
     params.set("search", query.search.trim());
   }
 
+  if (query.sortBy) {
+    params.set("sortBy", query.sortBy);
+  }
+
+  if (query.sortOrder) {
+    params.set("sortOrder", query.sortOrder);
+  }
+
   return request<WinesResponse>(`/api/wines?${params.toString()}`);
+}
+
+export function getDashboard(): Promise<DashboardResponse> {
+  return request<DashboardResponse>("/api/dashboard");
 }
 
 export function getWine(id: number): Promise<Wine> {
@@ -98,8 +197,22 @@ export function consumeWine(id: number): Promise<Wine> {
   return request<Wine>(`/api/wines/${id}/consume`, { method: "POST" });
 }
 
+export function updateWine(id: number, input: Partial<Pick<Wine, "quantity" | "totalValue">>): Promise<Wine> {
+  return request<Wine>(`/api/wines/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(input)
+  });
+}
+
 export function listTastingNotes(wineId: number): Promise<TastingNote[]> {
   return request<TastingNote[]>(`/api/wines/${wineId}/tasting-notes`);
+}
+
+export function getWineEnrichment(wineId: number): Promise<WineEnrichment | null> {
+  return request<WineEnrichment | null>(`/api/wines/${wineId}/enrichment`);
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

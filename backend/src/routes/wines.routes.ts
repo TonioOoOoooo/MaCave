@@ -13,6 +13,7 @@ import {
   listTastingNotes,
   updateTastingNote
 } from "../services/tasting-note.service.js";
+import { getWineEnrichment } from "../services/wine-enrichment.service.js";
 import {
   idParamSchema,
   tastingNoteCreateSchema,
@@ -60,6 +61,11 @@ winesRouter.post("/:id/consume", (req, res) => {
 winesRouter.get("/:id/tasting-notes", (req, res) => {
   const { id } = idParamSchema.parse(req.params);
   res.json(listTastingNotes(id));
+});
+
+winesRouter.get("/:id/enrichment", (req, res) => {
+  const { id } = idParamSchema.parse(req.params);
+  res.json(getWineEnrichment(id));
 });
 
 winesRouter.post("/:id/tasting-notes", (req, res) => {
