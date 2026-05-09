@@ -47,8 +47,8 @@ export function Dashboard({ onSelectWine, onOpenWines }: DashboardProps) {
 
       <div className="space-y-3">
         <WineListWidget title="Mes dernières sorties" wines={dashboard.latestOutputs} dateKind="out" empty="Aucune sortie récente." onSelectWine={onSelectWine} />
-        <ColorWidget rows={dashboard.colorCounts} total={dashboard.totals.bottles} />
-        <EffervescentPanel rows={dashboard.colorCounts} />
+        <ColorWidget rows={dashboard.tranquilleColorCounts} total={dashboard.totals.bottles} />
+        <EffervescentPanel counts={dashboard.effervescentCounts} />
         <WineListWidget title="Prêts à déguster" wines={dashboard.drinkReadyWines} dateKind="phase" empty="Aucun vin en maturité ou apogée." onSelectWine={onSelectWine} />
         <ProgressTable title="Mes vins à déguster par année" rows={dashboard.peakYearCounts} total={dashboard.totals.bottles} emptyText="Données de vieillissement non renseignées." />
         <CompactTable title="Mes vins par cépage" rows={dashboard.grapeCounts} />
@@ -236,14 +236,14 @@ function ColorWidget({ rows, total }: { rows: DashboardCount[]; total: number })
   );
 }
 
-function EffervescentPanel({ rows }: { rows: DashboardCount[] }) {
-  const count = rows.find((r) => r.label === "Effervescent")?.count ?? 0;
+function EffervescentPanel({ counts }: { counts: DashboardCount[] }) {
+  const total = counts.reduce((acc, r) => acc + r.count, 0);
   return (
     <Panel title="Vins effervescents" subtitle="Champagnes & pétillants">
       <div className="flex items-center gap-5 py-1">
         <BottleGlyph color="Effervescent" />
         <div>
-          <p className="text-3xl font-light">{count}</p>
+          <p className="text-3xl font-light">{total}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">bouteilles</p>
         </div>
       </div>

@@ -39,6 +39,9 @@ export function getDashboard() {
   const totalValue = sum(enrichedWines.map(({ wine, enrichment }) => enrichment?.marketStockValue ?? wine.totalValue ?? 0));
   const stockValue = sum(enrichedWines.map(({ wine, enrichment }) => enrichment?.stockAmount ?? wine.purchaseTotalPrice ?? 0));
   const addedValue = sum(enrichedWines.map(({ enrichment }) => enrichment?.addedValue ?? 0));
+  const purchaseTotalPriceSum = sum(allWines.map((wine) => wine.purchaseTotalPrice ?? 0));
+  const bottlesWithPurchasePrice = sum(allWines.map((wine) => (wine.purchaseTotalPrice != null && wine.purchaseTotalPrice > 0) ? wine.quantity : 0));
+  const avgPurchasePrice = bottlesWithPurchasePrice > 0 ? purchaseTotalPriceSum / bottlesWithPurchasePrice : 0;
 
   return {
     totals: {
@@ -47,7 +50,7 @@ export function getDashboard() {
       value: totalValue,
       stockValue,
       addedValue,
-      avgPurchasePrice: totalBottles > 0 ? stockValue / totalBottles : 0
+      avgPurchasePrice
     },
     phaseCounts: countByPhase(allWines),
     latestEntries: enrichedWines
@@ -65,7 +68,8 @@ export function getDashboard() {
       .sort((a, b) => b.wine.quantity - a.wine.quantity)
       .slice(0, 8)
       .map(({ wine, enrichment }) => toDashboardWine(wine, enrichment)),
-    colorCounts: countBy(allWines, (wine) => normalizeColor(wine.color ?? wine.wineType)),
+    tranquilleColorCounts: countBy(allWines.filter((w) => !isEffervescent(w)), (wine) => normalizeColor(wine.color ?? wine.wineType)),
+    effervescentCounts: countBy(allWines.filter((w) => isEffervescent(w)), (wine) => normalizeColor(wine.color ?? wine.wineType)),
     regionCounts: countBy(allWines, (wine) => wine.region ?? "Non renseignée"),
     regionDrilldown: buildRegionDrilldown(allWines),
     grapeCounts: countGrapes(allWines),
@@ -179,6 +183,10 @@ function splitGrapes(value: string | null) {
   return value.split(",").map((grape) => grape.trim().replace(/\s+\d+%$/, "")).filter(Boolean);
 }
 
+function isEffervescent(wine: Wine) {
+  return (wine.wineType ?? "").toLowerCase().includes("effervescent");
+}
+
 function normalizeColor(value: string | null) {
   const normalized = value?.toLowerCase() ?? "";
   if (normalized.includes("rouge")) return "Rouge";
@@ -202,21 +210,28 @@ function getUsableImageUrl(value: string | null) {
 }
 
 function countPeakYears(allWines: Wine[]): Array<{ label: string; count: number }> {
-  const counts = new Map<number, number>();
-  const currentYear = new Date().getFullYear();
+  const y0 = new Date().getFullYear();
+  const y1 = y0 + 1;
+  const y2 = y0 + 2;
+
+  const buckets = [
+    { label: `<${y0}`, count: 0 },
+    { label: String(y0), count: 0 },
+    { label: String(y1), count: 0 },
+    { label: String(y2), count: 0 },
+    { label: `>${y2}`, count: 0 }
+  ];
 
   for (const wine of allWines) {
-    if (!wine.peakMin || !wine.peakMax || wine.quantity <= 0) continue;
-    const start = Math.max(wine.peakMin, currentYear - 1);
-    const end = Math.min(wine.peakMax, currentYear + 14);
-    for (let year = start; year <= end; year++) {
-      counts.set(year, (counts.get(year) ?? 0) + wine.quantity);
-    }
+    if (wine.peakMax == null || wine.quantity <= 0) continue;
+    if (wine.peakMax < y0) buckets[0].count += wine.quantity;
+    else if (wine.peakMax === y0) buckets[1].count += wine.quantity;
+    else if (wine.peakMax === y1) buckets[2].count += wine.quantity;
+    else if (wine.peakMax === y2) buckets[3].count += wine.quantity;
+    else buckets[4].count += wine.quantity;
   }
 
-  return [...counts.entries()]
-    .map(([year, count]) => ({ label: String(year), count }))
-    .sort((a, b) => Number(a.label) - Number(b.label));
+  return buckets;
 }
 
 function buildRegionDrilldown(allWines: Wine[]): Record<string, Array<{ label: string; count: number }>> {

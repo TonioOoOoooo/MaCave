@@ -135,7 +135,8 @@ export type DashboardResponse = {
   latestEntries: DashboardWine[];
   latestOutputs: DashboardWine[];
   drinkReadyWines: DashboardWine[];
-  colorCounts: DashboardCount[];
+  tranquilleColorCounts: DashboardCount[];
+  effervescentCounts: DashboardCount[];
   regionCounts: DashboardCount[];
   regionDrilldown: Record<string, DashboardCount[]>;
   grapeCounts: DashboardCount[];
