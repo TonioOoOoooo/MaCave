@@ -116,7 +116,11 @@ function buildWhere(query: WineQuery) {
     if (!(key in filterColumns)) continue;
 
     const column = filterColumns[key as keyof typeof filterColumns];
-    clauses.push(eq(column as never, (key === "vintage" ? Number(value) : String(value)) as never));
+    if (key === "agingPhases") {
+      clauses.push(like(column as never, `%${String(value)}%`));
+    } else {
+      clauses.push(eq(column as never, (key === "vintage" ? Number(value) : String(value)) as never));
+    }
   }
 
   return clauses.length ? and(...clauses) : undefined;

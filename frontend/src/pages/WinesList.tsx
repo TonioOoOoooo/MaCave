@@ -16,18 +16,21 @@ const sortOptions: Record<SortOption, { label: string; sortBy: "region" | "vinta
 
 type WinesListProps = {
   onSelectWine: (id: number) => void;
+  initialSearch?: string;
+  initialPhase?: string;
 };
 
-export function WinesList({ onSelectWine }: WinesListProps) {
+export function WinesList({ onSelectWine, initialSearch, initialPhase }: WinesListProps) {
   const [page, setPage] = useState(1);
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState(initialSearch ?? "");
+  const [search, setSearch] = useState(initialSearch ?? "");
+  const [phase, setPhase] = useState(initialPhase ?? "");
   const [stockFilter, setStockFilter] = useState<StockFilter>("all");
   const [sortOption, setSortOption] = useState<SortOption>("regionAsc");
   const sort = sortOptions[sortOption];
   const winesQuery = useQuery({
-    queryKey: ["wines", { page, pageSize, search, sortOption }],
-    queryFn: () => listWines({ page, pageSize, search, sortBy: sort.sortBy, sortOrder: sort.sortOrder })
+    queryKey: ["wines", { page, pageSize, search, phase, sortOption }],
+    queryFn: () => listWines({ page, pageSize, search, filters: phase ? { agingPhases: phase } : undefined, sortBy: sort.sortBy, sortOrder: sort.sortOrder })
   });
 
   function submitSearch(event: FormEvent<HTMLFormElement>) {
@@ -100,6 +103,20 @@ export function WinesList({ onSelectWine }: WinesListProps) {
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
             Recherche active : <span className="font-semibold text-slate-900 dark:text-slate-100">{search}</span>
           </p>
+        ) : null}
+
+        {phase ? (
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <span className="text-slate-600 dark:text-slate-300">Phase :</span>
+            <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold ring-1 ring-slate-200 dark:bg-slate-800 dark:ring-slate-700">{phase}</span>
+            <button
+              type="button"
+              onClick={() => { setPhase(""); setPage(1); }}
+              className="text-xs text-slate-500 underline hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+            >
+              Effacer
+            </button>
+          </div>
         ) : null}
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">

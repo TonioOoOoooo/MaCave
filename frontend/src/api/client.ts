@@ -148,6 +148,7 @@ export type WinesQuery = {
   page: number;
   pageSize: number;
   search?: string;
+  filters?: Record<string, string>;
   sortBy?: "region" | "vintage" | "quantity";
   sortOrder?: "asc" | "desc";
 };
@@ -172,6 +173,10 @@ export async function listWines(query: WinesQuery): Promise<WinesResponse> {
 
   if (query.search?.trim()) {
     params.set("search", query.search.trim());
+  }
+
+  if (query.filters && Object.keys(query.filters).length > 0) {
+    params.set("filters", JSON.stringify(query.filters));
   }
 
   if (query.sortBy) {

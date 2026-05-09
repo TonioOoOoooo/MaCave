@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { type FormEvent, useState } from "react";
 import { getDashboard, type DashboardCount, type DashboardWine } from "../api/client";
 import heroVineyard from "../assets/hero-vineyard.png";
 
@@ -7,7 +8,7 @@ const subtitleClass = "text-xs font-medium text-slate-500 dark:text-slate-400";
 
 type DashboardProps = {
   onSelectWine: (id: number) => void;
-  onOpenWines: () => void;
+  onOpenWines: (opts?: { search?: string; phase?: string }) => void;
 };
 
 export function Dashboard({ onSelectWine, onOpenWines }: DashboardProps) {
@@ -36,9 +37,9 @@ export function Dashboard({ onSelectWine, onOpenWines }: DashboardProps) {
           ready={dashboard.drinkReadyWines.length}
           onOpenWines={onOpenWines}
         />
-        <SearchWidget />
+        <SearchWidget onSearch={(search) => onOpenWines({ search })} />
         <QuickActions />
-        <PhaseDistribution counts={dashboard.phaseCounts} />
+        <PhaseDistribution counts={dashboard.phaseCounts} onPhaseClick={(phase) => onOpenWines({ phase })} />
         <ValueWidget total={dashboard.totals.value} stock={dashboard.totals.stockValue} added={dashboard.totals.addedValue} />
         <CompactTable title="Mes vins par région" rows={dashboard.regionCounts} />
         <StockEvolution total={dashboard.totals.bottles} />
@@ -92,10 +93,28 @@ function HeroStockCard({ bottles, wines, value, ready, onOpenWines }: { bottles:
   );
 }
 
-function SearchWidget() {
+function SearchWidget({ onSearch }: { onSearch: (query: string) => void }) {
+  const [value, setValue] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = value.trim();
+    if (trimmed) onSearch(trimmed);
+  }
+
   return (
     <Panel title="Rechercher un vin dans ma cave">
-      <input className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition duration-150 focus:border-red-600 focus:ring-2 focus:ring-red-100 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-red-950" />
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <input
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Bordeaux, domaine, cuvée..."
+          className="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition duration-150 focus:border-red-600 focus:ring-2 focus:ring-red-100 dark:border-slate-700 dark:bg-slate-950 dark:focus:ring-red-950"
+        />
+        <button type="submit" className="h-10 shrink-0 rounded-md bg-red-700 px-3 text-sm font-semibold text-white transition duration-150 hover:bg-red-800">
+          Chercher
+        </button>
+      </form>
     </Panel>
   );
 }
@@ -112,25 +131,25 @@ function QuickActions() {
   );
 }
 
-function PhaseDistribution({ counts }: { counts: { youth: number; maturity: number; peak: number; decline: number } }) {
+function PhaseDistribution({ counts, onPhaseClick }: { counts: { youth: number; maturity: number; peak: number; decline: number }; onPhaseClick: (phase: string) => void }) {
   return (
     <Panel title="Répartition des bouteilles par phase">
       <div className="grid grid-cols-2 divide-x divide-y divide-slate-200 overflow-hidden rounded-md border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
-        <PhaseCell label="Jeunesse" value={counts.youth} tone="youth" />
-        <PhaseCell label="Maturité" value={counts.maturity} tone="maturity" />
-        <PhaseCell label="Apogée" value={counts.peak} tone="peak" />
-        <PhaseCell label="Déclin" value={counts.decline} tone="decline" />
+        <PhaseCell label="Jeunesse" value={counts.youth} tone="youth" onClick={() => onPhaseClick("Jeunesse")} />
+        <PhaseCell label="Maturité" value={counts.maturity} tone="maturity" onClick={() => onPhaseClick("Maturité")} />
+        <PhaseCell label="Apogée" value={counts.peak} tone="peak" onClick={() => onPhaseClick("Apogée")} />
+        <PhaseCell label="Déclin" value={counts.decline} tone="decline" onClick={() => onPhaseClick("Déclin")} />
       </div>
     </Panel>
   );
 }
 
-function PhaseCell({ label, value, tone }: { label: string; value: number; tone: PhaseTone }) {
+function PhaseCell({ label, value, tone, onClick }: { label: string; value: number; tone: PhaseTone; onClick: () => void }) {
   return (
-    <div className="p-3 text-center">
+    <button type="button" onClick={onClick} className="p-3 text-center transition duration-150 hover:bg-slate-50 dark:hover:bg-slate-800">
       <p className="text-xl font-semibold">{value}</p>
       <PhaseBadge label={label} tone={tone} />
-    </div>
+    </button>
   );
 }
 
