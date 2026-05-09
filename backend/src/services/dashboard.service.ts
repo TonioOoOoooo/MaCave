@@ -46,7 +46,8 @@ export function getDashboard() {
       wines: allWines.length,
       value: totalValue,
       stockValue,
-      addedValue
+      addedValue,
+      avgPurchasePrice: totalBottles > 0 ? stockValue / totalBottles : 0
     },
     phaseCounts: countByPhase(allWines),
     latestEntries: enrichedWines
@@ -66,8 +67,11 @@ export function getDashboard() {
       .map(({ wine, enrichment }) => toDashboardWine(wine, enrichment)),
     colorCounts: countBy(allWines, (wine) => normalizeColor(wine.color ?? wine.wineType)),
     regionCounts: countBy(allWines, (wine) => wine.region ?? "Non renseignée"),
+    regionDrilldown: buildRegionDrilldown(allWines),
     grapeCounts: countGrapes(allWines),
     vintageRanges: countVintageRanges(allWines),
+    peakYearCounts: countPeakYears(allWines),
+    rangeCounts: countBy(allWines, (wine) => wine.range ?? "Non renseignée"),
     cellarCounts: countBy(allWines, (wine) => wine.cellar ?? "Non renseignée"),
     packagingCounts: countBy(allWines, (wine) => wine.packagingType ?? "Non renseigné"),
     purchaseTypeCounts: countBy(allWines, (wine) => wine.purchaseType ?? "Non renseigné"),
@@ -195,6 +199,46 @@ function compareDateDesc(a: string | null, b: string | null) {
 
 function getUsableImageUrl(value: string | null) {
   return value?.startsWith("http://") || value?.startsWith("https://") ? value : null;
+}
+
+function countPeakYears(allWines: Wine[]): Array<{ label: string; count: number }> {
+  const counts = new Map<number, number>();
+  const currentYear = new Date().getFullYear();
+
+  for (const wine of allWines) {
+    if (!wine.peakMin || !wine.peakMax || wine.quantity <= 0) continue;
+    const start = Math.max(wine.peakMin, currentYear - 1);
+    const end = Math.min(wine.peakMax, currentYear + 14);
+    for (let year = start; year <= end; year++) {
+      counts.set(year, (counts.get(year) ?? 0) + wine.quantity);
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([year, count]) => ({ label: String(year), count }))
+    .sort((a, b) => Number(a.label) - Number(b.label));
+}
+
+function buildRegionDrilldown(allWines: Wine[]): Record<string, Array<{ label: string; count: number }>> {
+  const regionMap = new Map<string, Map<string, number>>();
+
+  for (const wine of allWines) {
+    const region = wine.region ?? "Non renseignée";
+    if (!regionMap.has(region)) regionMap.set(region, new Map());
+    const appellationMap = regionMap.get(region)!;
+    const appellation = wine.appellation ?? "Non renseignée";
+    appellationMap.set(appellation, (appellationMap.get(appellation) ?? 0) + wine.quantity);
+  }
+
+  const result: Record<string, Array<{ label: string; count: number }>> = {};
+  for (const [region, appellationMap] of regionMap.entries()) {
+    result[region] = [...appellationMap.entries()]
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "fr"))
+      .slice(0, 8);
+  }
+
+  return result;
 }
 
 function sum(values: number[]) {

@@ -124,6 +124,7 @@ export type DashboardResponse = {
     value: number;
     stockValue: number;
     addedValue: number;
+    avgPurchasePrice: number;
   };
   phaseCounts: {
     youth: number;
@@ -136,8 +137,11 @@ export type DashboardResponse = {
   drinkReadyWines: DashboardWine[];
   colorCounts: DashboardCount[];
   regionCounts: DashboardCount[];
+  regionDrilldown: Record<string, DashboardCount[]>;
   grapeCounts: DashboardCount[];
   vintageRanges: DashboardCount[];
+  peakYearCounts: DashboardCount[];
+  rangeCounts: DashboardCount[];
   cellarCounts: DashboardCount[];
   packagingCounts: DashboardCount[];
   purchaseTypeCounts: DashboardCount[];

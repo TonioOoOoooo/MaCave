@@ -40,16 +40,17 @@ export function Dashboard({ onSelectWine, onOpenWines }: DashboardProps) {
         <SearchWidget onSearch={(search) => onOpenWines({ search })} />
         <QuickActions />
         <PhaseDistribution counts={dashboard.phaseCounts} onPhaseClick={(phase) => onOpenWines({ phase })} />
-        <ValueWidget total={dashboard.totals.value} stock={dashboard.totals.stockValue} added={dashboard.totals.addedValue} />
-        <CompactTable title="Mes vins par région" rows={dashboard.regionCounts} />
+        <ValueWidget total={dashboard.totals.value} stock={dashboard.totals.stockValue} added={dashboard.totals.addedValue} avgPurchasePrice={dashboard.totals.avgPurchasePrice} />
+        <RegionTable rows={dashboard.regionCounts} drilldown={dashboard.regionDrilldown} />
         <StockEvolution total={dashboard.totals.bottles} />
       </div>
 
       <div className="space-y-3">
         <WineListWidget title="Mes dernières sorties" wines={dashboard.latestOutputs} dateKind="out" empty="Aucune sortie récente." onSelectWine={onSelectWine} />
         <ColorWidget rows={dashboard.colorCounts} total={dashboard.totals.bottles} />
+        <EffervescentPanel rows={dashboard.colorCounts} />
         <WineListWidget title="Prêts à déguster" wines={dashboard.drinkReadyWines} dateKind="phase" empty="Aucun vin en maturité ou apogée." onSelectWine={onSelectWine} />
-        <ProgressTable title="Mes vins à déguster par millésime" rows={dashboard.vintageRanges} total={dashboard.totals.bottles} />
+        <ProgressTable title="Mes vins à déguster par année" rows={dashboard.peakYearCounts} total={dashboard.totals.bottles} emptyText="Données de vieillissement non renseignées." />
         <CompactTable title="Mes vins par cépage" rows={dashboard.grapeCounts} />
       </div>
 
@@ -57,6 +58,7 @@ export function Dashboard({ onSelectWine, onOpenWines }: DashboardProps) {
         <WineListWidget title="Mes dernières entrées" wines={dashboard.latestEntries.length ? dashboard.latestEntries : dashboard.recentWines} dateKind="entry" empty="Aucune entrée récente." onSelectWine={onSelectWine} />
         <CompactTable title="Mes vins par cave" rows={dashboard.cellarCounts} />
         <ProgressTable title="Mes vins par millésime" rows={dashboard.vintageRanges} total={dashboard.totals.bottles} />
+        <CompactTable title="Mes vins par gamme" rows={dashboard.rangeCounts} />
         <CompactTable title="Mes vins par conditionnement" rows={dashboard.packagingCounts} />
         <CompactTable title="Mes vins par type d'achat" rows={dashboard.purchaseTypeCounts} />
       </div>
@@ -153,11 +155,12 @@ function PhaseCell({ label, value, tone, onClick }: { label: string; value: numb
   );
 }
 
-function ValueWidget({ total, stock, added }: { total: number; stock: number; added: number }) {
+function ValueWidget({ total, stock, added, avgPurchasePrice }: { total: number; stock: number; added: number; avgPurchasePrice: number }) {
   return (
-    <Panel title="Valeur de ma cave" subtitle="Mai 2026">
-      <div className="grid grid-cols-2 divide-x divide-slate-200 border-b border-slate-200 pb-3 text-center dark:divide-slate-800 dark:border-slate-800">
+    <Panel title="Valeur de ma cave" subtitle={new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(new Date())}>
+      <div className="grid grid-cols-3 divide-x divide-slate-200 border-b border-slate-200 pb-3 text-center dark:divide-slate-800 dark:border-slate-800">
         <Metric label="Prix achat" value={formatCurrency(stock)} />
+        <Metric label="Moy. / btl." value={formatCurrency(avgPurchasePrice)} />
         <Metric label="Plus-value" value={formatCurrency(added)} />
       </div>
       <div className="py-4 text-center">
@@ -215,11 +218,11 @@ function WineListWidget({
 
 function ColorWidget({ rows, total }: { rows: DashboardCount[]; total: number }) {
   const colorMap = new Map(rows.map((row) => [row.label, row.count]));
-  const items = ["Rouge", "Blanc", "Rosé", "Effervescent"];
+  const items = ["Rouge", "Blanc", "Rosé"];
 
   return (
-    <Panel title="Mes vins par couleur" subtitle="Par nombre de bouteilles">
-      <div className="grid grid-cols-2 divide-x divide-y divide-slate-200 text-center dark:divide-slate-800">
+    <Panel title="Mes vins" subtitle="Par couleur">
+      <div className="grid grid-cols-3 divide-x divide-slate-200 text-center dark:divide-slate-800">
         {items.map((item) => (
           <div key={item} className="p-3">
             <BottleGlyph color={item} />
@@ -229,6 +232,21 @@ function ColorWidget({ rows, total }: { rows: DashboardCount[]; total: number })
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-slate-500 dark:text-slate-400">{total} bouteilles au total</p>
+    </Panel>
+  );
+}
+
+function EffervescentPanel({ rows }: { rows: DashboardCount[] }) {
+  const count = rows.find((r) => r.label === "Effervescent")?.count ?? 0;
+  return (
+    <Panel title="Vins effervescents" subtitle="Champagnes & pétillants">
+      <div className="flex items-center gap-5 py-1">
+        <BottleGlyph color="Effervescent" />
+        <div>
+          <p className="text-3xl font-light">{count}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">bouteilles</p>
+        </div>
+      </div>
     </Panel>
   );
 }
@@ -248,17 +266,57 @@ function CompactTable({ title, rows }: { title: string; rows: DashboardCount[] }
   );
 }
 
-function ProgressTable({ title, rows, total }: { title: string; rows: DashboardCount[]; total: number }) {
+function ProgressTable({ title, rows, total, emptyText }: { title: string; rows: DashboardCount[]; total: number; emptyText?: string }) {
   return (
     <Panel title={title}>
-      <div className="space-y-1.5">
-        {rows.map((row) => (
-          <div key={row.label} className="grid grid-cols-[90px_42px_1fr] items-center gap-3 text-sm">
-            <span className="truncate text-slate-700 dark:text-slate-200">{row.label}</span>
-            <span className="text-right font-semibold">{row.count}</span>
-            <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
-              <div className="h-2 rounded-full bg-slate-800 dark:bg-slate-200" style={{ width: `${Math.min(100, total ? (row.count / total) * 100 : 0)}%` }} />
+      {rows.length === 0 && emptyText ? (
+        <EmptyText>{emptyText}</EmptyText>
+      ) : (
+        <div className="space-y-1.5">
+          {rows.map((row) => (
+            <div key={row.label} className="grid grid-cols-[90px_42px_1fr] items-center gap-3 text-sm">
+              <span className="truncate text-slate-700 dark:text-slate-200">{row.label}</span>
+              <span className="text-right font-semibold">{row.count}</span>
+              <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800">
+                <div className="h-2 rounded-full bg-slate-800 dark:bg-slate-200" style={{ width: `${Math.min(100, total ? (row.count / total) * 100 : 0)}%` }} />
+              </div>
             </div>
+          ))}
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+function RegionTable({ rows, drilldown }: { rows: DashboardCount[]; drilldown: Record<string, DashboardCount[]> }) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  return (
+    <Panel title="Mes vins par région" subtitle="Par nombre de bouteilles">
+      <div className="divide-y divide-slate-200 dark:divide-slate-800">
+        {rows.slice(0, 8).map((row) => (
+          <div key={row.label}>
+            <button
+              type="button"
+              onClick={() => setExpanded(expanded === row.label ? null : row.label)}
+              className="flex w-full items-center justify-between gap-3 rounded px-1 py-1.5 text-sm transition duration-150 hover:bg-slate-50 dark:hover:bg-slate-800"
+            >
+              <span className="min-w-0 truncate text-slate-700 dark:text-slate-200">{row.label}</span>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="font-semibold">{row.count}</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500">{expanded === row.label ? "▲" : "▼"}</span>
+              </div>
+            </button>
+            {expanded === row.label && drilldown[row.label] && (
+              <div className="mb-1.5 ml-2 space-y-0.5 border-l-2 border-slate-200 pl-3 dark:border-slate-700">
+                {drilldown[row.label].map((sub) => (
+                  <div key={sub.label} className="flex items-center justify-between gap-3 py-0.5 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="min-w-0 truncate">{sub.label}</span>
+                    <span className="font-medium">{sub.count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

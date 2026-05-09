@@ -2,7 +2,20 @@
   "permissions": {
     "allow": [
       "Bash(dir *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(Get-ChildItem *)",
+      "Bash(awk '{print $NF}')",
+      "Bash(Start-Sleep -Seconds 4)",
+      "Bash(curl -s http://localhost:3015/api/dashboard)",
+      "Bash(python -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('totals:', json.dumps\\(d['totals'], indent=2\\)\\); print\\('regionDrilldown keys:', list\\(d['regionDrilldown'].keys\\(\\)\\)[:3]\\); print\\('peakYearCounts sample:', d['peakYearCounts'][:5]\\); print\\('rangeCounts sample:', d['rangeCounts'][:5]\\)\")",
+      "PowerShell(curl *)",
+      "PowerShell(npm run *)",
+      "PowerShell(Start-Process -FilePath \"pwsh\" -ArgumentList \"-Command\", \"Set-Location 'c:\\\\Dev\\\\MaCave'; npm run dev\" -WindowStyle Hidden; Start-Sleep -Seconds 8; try { Invoke-RestMethod -Uri \"http://localhost:3015/api/dashboard\" -TimeoutSec 5 | ConvertTo-Json -Depth 2 } catch { Write-Host \"Error: $_\" })",
+      "PowerShell(npm install *)",
+      "PowerShell(Invoke-RestMethod -Uri \"http://localhost:3015/api/health\")",
+      "PowerShell(Start-Process -FilePath \"pwsh\" -ArgumentList \"-NoExit\", \"-Command\", \"Set-Location 'c:\\\\Dev\\\\MaCave'; npm run dev -w backend\" -WindowStyle Minimized; Start-Sleep -Seconds 7; Invoke-RestMethod -Uri \"http://localhost:3015/api/health\")",
+      "PowerShell($d = Invoke-RestMethod -Uri \"http://localhost:3015/api/dashboard\"; Write-Host \"=== totals ===\"; $d.totals | ConvertTo-Json; Write-Host \"`n=== peakYearCounts \\(5 premiers\\) ===\"; $d.peakYearCounts | Select-Object -First 5 | ConvertTo-Json; Write-Host \"`n=== rangeCounts \\(5 premiers\\) ===\"; $d.rangeCounts | Select-Object -First 5 | ConvertTo-Json; Write-Host \"`n=== regionDrilldown \\(1 region\\) ===\"; $region = \\($d.regionDrilldown | Get-Member -MemberType NoteProperty | Select-Object -First 1\\).Name; Write-Host \"Region: $region\"; $d.regionDrilldown.$region | ConvertTo-Json)",
+      "PowerShell($d = Invoke-RestMethod -Uri \"http://localhost:3015/api/dashboard\"; Write-Host \"peakYearCounts count:\" $d.peakYearCounts.Count; $d.peakYearCounts | ConvertTo-Json)"
     ]
   }
 }
